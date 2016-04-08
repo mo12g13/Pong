@@ -1,4 +1,6 @@
-package com.clara;
+package com.Momo;
+
+import sun.swing.PrintColorUIResource;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,32 +52,58 @@ public class Main {
     
     static boolean gameOver;      //Used to work out what message, if any, to display on the screen
     static boolean removeInstructions = false;  // Same as above
+    static  int compScore;
+    static  int humanPlayerScore;
 
     private static class GameDisplay extends JPanel {
 
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
+            g.setColor(PrintColorUIResource.green);
+
 
             //System.out.println("* Repaint *");
+            g.setColor(Color.magenta);
 
             if (gameOver == true) {
                 g.drawString( "Game over!", 20, 30 );
-                return;
+
+                // this expressions resets the paddle and ball after game is game is over. That is paddle and ball are reposition
+                // on the screen
+                computerPaddleY = screenSize / 3 ;
+                humanPaddleY = screenSize / 3;
+
+
+                ballX = screenSize / 3;   //Creation of coordinates taking into consideration that the balls is in a square
+                ballY = screenSize / 3;
+
+                gameOver = false;
+                timer.start();
+
             }
+            gameOver = false;
 
             if (removeInstructions == false ) {
                 g.drawString("Pong! Press up or down to move", 20, 30);
                 g.drawString("Press q to quit", 20, 60);
-            }
 
-            g.setColor(Color.blue);
+            }
+            //Display  score on the GameDisplay
+            String scoreOfPlayers = "Score: Computer: "+ compScore +" Human: "+ humanPlayerScore;
+            g.drawString(scoreOfPlayers,100, 40 );
+            //The color of the ball
+            g.setColor(Color.ORANGE);
+
 
             //While game is playing, these methods draw the ball, paddles, using the global variables
             //Other parts of the code will modify these variables
 
             //Ball - a circle is just an oval with the height equal to the width
             g.drawOval((int)ballX, (int)ballY, ballSize, ballSize);
+
+            //Fill the ball with the Orange color using the g.fillOal since the ball an oval with specify height and width
+            g.fillOval((int)ballX, (int)ballY, ballSize, ballSize);
             //Computer paddle
             g.drawLine(paddleDistanceFromSide, computerPaddleY - paddleSize, paddleDistanceFromSide, computerPaddleY + paddleSize);
             //Human paddle
@@ -93,9 +121,12 @@ public class Main {
             char q = 'q';
             if( keyPressed == q){
                 System.exit(0);    //quit if user presses the q key.
+                gameOver = true;
+
             }
+
         }
-        
+
         @Override
         public void keyReleased(KeyEvent ev) {}   //Don't need this one, but required to implement it.
         
@@ -169,7 +200,8 @@ public class Main {
                 Main.moveComputerPaddle();
 
                 if (gameOver) {
-                    timer.stop();
+                    //Changed the timer.Stop to timer.restart() which automatically restart the game
+                    timer.restart();
                 }
                 gamePanel.repaint();
             }
@@ -193,11 +225,11 @@ public class Main {
 
         System.out.println("computer paddle speed = " + computerPaddleSpeed);
 
-        if (ballPaddleDifference > 0 ) {   //Difference is positive - paddle is below ball on screen
-            computerPaddleY -= distanceToMove;
-
-        } else if (ballPaddleDifference < 0){
+        if (ballPaddleDifference < 0 ) {   //Difference is positive - paddle is below ball on screen
             computerPaddleY += distanceToMove;
+
+        } else if (ballPaddleDifference > 0){
+            computerPaddleY -= distanceToMove;
 
         } else {
             //Ball and paddle are aligned. Don't need to move!
@@ -221,7 +253,16 @@ public class Main {
         boolean hitHumanPaddle = false;
         boolean hitComputerPaddle = false;
 
-        if (ballX <= 0 || ballX >= screenSize ) {
+        // When ball touch computerPlayer wall, The human player point is incremented
+        if (ballX <= 0) {
+            humanPlayerScore++;
+            gameOver = true;
+            return;
+        }
+
+        // When ball hit touch human Player wall, computer player score or point is incremented
+        if (ballX >= screenSize) {
+            compScore ++;
             gameOver = true;
             return;
         }
