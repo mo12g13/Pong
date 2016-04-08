@@ -71,11 +71,11 @@ public class Main {
 
                 // this expressions resets the paddle and ball after game is game is over. That is paddle and ball are reposition
                 // on the screen
-                computerPaddleY = screenSize / 3 ;
-                humanPaddleY = screenSize / 3;
+                computerPaddleY = screenSize / 2 ;
+                humanPaddleY = screenSize / 2;
 
 
-                ballX = screenSize / 3;   //Creation of coordinates taking into consideration that the balls is in a square
+                ballX = screenSize / 2;   //Creation of coordinates taking into consideration that the balls is in a square
                 ballY = screenSize / 3;
 
                 gameOver = false;
